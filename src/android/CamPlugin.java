@@ -148,7 +148,7 @@ public class CamPlugin extends CordovaPlugin {
         dispatchTakePictureIntent();
 
       } catch (IOException io) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+        PluginResult result = new PluginResult(PluginResult.Status.OK);
         context.sendPluginResult(result);
 
         //Toast.makeText(cordova.getActivity(), "error camera", Toast.LENGTH_SHORT).show();
@@ -264,19 +264,18 @@ public class CamPlugin extends CordovaPlugin {
       }
 
       else if (resultCode == 0) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+        PluginResult result = new PluginResult(PluginResult.Status.ERROR);
         context.sendPluginResult(result);
         //  Toast.makeText(cordova.getActivity(), "User cancelled image capture", Toast.LENGTH_SHORT).show();
       } else {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+        PluginResult result = new PluginResult(PluginResult.Status.ERROR);
         context.sendPluginResult(result);
 
         //Toast.makeText(cordova.getActivity(), "Sorry, You Cant't Capture Image", Toast.LENGTH_SHORT).show();
       }
       if (!isDeviceSupportCamera()) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+        PluginResult result = new PluginResult(PluginResult.Status.ERROR);
         context.sendPluginResult(result);
-
         //  Toast.makeText(cordova.getActivity(), "Sorry! Your device doesn't support camera", Toast.LENGTH_LONG).show();
       }
     } else {
