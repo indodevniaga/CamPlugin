@@ -73,12 +73,12 @@ public class CamPlugin extends CordovaPlugin {
     //     DURATION_LONG.equals(duration) ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
     // // Display toast
     // toast.show();
-    if(hasPermisssionStorage()){
+    if(hasPermisssionStorage()==true){
       try {
         dispatchTakePictureIntent();
 
       } catch (IOException io) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK);
+        PluginResult result = new PluginResult(PluginResult.Status.ERROR);
         context.sendPluginResult(result);
 
         //Toast.makeText(cordova.getActivity(), "error camera", Toast.LENGTH_SHORT).show();
@@ -138,7 +138,7 @@ public class CamPlugin extends CordovaPlugin {
     boolean statusPermission = false;
     for (String p : permissions) {
       if (!PermissionHelper.hasPermission(this, p)) {
-    
+    return false;
       }
     }
 
