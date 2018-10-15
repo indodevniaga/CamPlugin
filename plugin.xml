@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-camplugin" version="0.0.1">
+    <name>CamPlugin</name>
+
+    <description>An Android Cordova plugin that allows users to display simple Toast messages at the bottom of the screen.</description>
+    <license>MIT</license>
+
+    <keywords>cordova,android,toast,message,alert</keywords>
+    <repo>https://github.com/stanidesis/toastyplugin/Toast-PhoneGap-Plugin.git</repo>
+    <issue>https://github.com/stanidesis/toastyplugin/issues</issue>
+  
+    <engines>
+        <engine name="cordova" version=">=3.0.0"/>
+    </engines>
+  
+    <js-module src="www/camplugin.js" name="camPlugin">
+        <clobbers target="window.plugins.camPlugin" />
+    </js-module>
+    <platform name="android">
+       <config-file target="AndroidManifest.xml" parent="/*">
+          <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        
+          <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+          <uses-permission android:name="android.permission.CAMERA" />
+       </config-file>
+        <config-file target="res/xml/config.xml" parent="/*">
+         
+            <feature name="CamPlugin">
+                <param name="android-package" value="com.indodevniaga.cordova.plugin.CamPlugin"/>
+            </feature>
+             <feature name="FileUtil">
+                <param name="android-package" value="com.indodevniaga.cordova.plugin.FileUtil"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/CamPlugin.java" target-dir="src/com/indodevniaga/cordova/plugin" />
+        <source-file src="src/android/FileUtil.java" target-dir="src/com/indodevniaga/cordova/plugin" />
+    </platform>
+</plugin>
