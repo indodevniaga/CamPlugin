@@ -69,10 +69,10 @@ public class CamPlugin extends CordovaPlugin {
       return false;
     }
     // Create the toast
-    Toast toast = Toast.makeText(cordova.getActivity(), message,
-        DURATION_LONG.equals(duration) ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
-    // Display toast
-    toast.show();
+    // Toast toast = Toast.makeText(cordova.getActivity(), message,
+    //     DURATION_LONG.equals(duration) ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
+    // // Display toast
+    // toast.show();
     requestPermissionsStorage(0);
     
     return true;
@@ -143,12 +143,15 @@ public class CamPlugin extends CordovaPlugin {
     }
     switch (requestCode) {
     case 0:
-      Toast.makeText(cordova.getActivity(), "Have Permission", Toast.LENGTH_SHORT).show();
+     // Toast.makeText(cordova.getActivity(), "Have Permission", Toast.LENGTH_SHORT).show();
       try {
         dispatchTakePictureIntent();
 
       } catch (IOException io) {
-        Toast.makeText(cordova.getActivity(), "error camera", Toast.LENGTH_SHORT).show();
+        PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+        context.sendPluginResult(result);
+
+        //Toast.makeText(cordova.getActivity(), "error camera", Toast.LENGTH_SHORT).show();
       }
       break;
 
@@ -261,12 +264,20 @@ public class CamPlugin extends CordovaPlugin {
       }
 
       else if (resultCode == 0) {
-        Toast.makeText(cordova.getActivity(), "User cancelled image capture", Toast.LENGTH_SHORT).show();
+        PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+        context.sendPluginResult(result);
+        //  Toast.makeText(cordova.getActivity(), "User cancelled image capture", Toast.LENGTH_SHORT).show();
       } else {
-        Toast.makeText(cordova.getActivity(), "Sorry, You Cant't Capture Image", Toast.LENGTH_SHORT).show();
+        PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+        context.sendPluginResult(result);
+
+        //Toast.makeText(cordova.getActivity(), "Sorry, You Cant't Capture Image", Toast.LENGTH_SHORT).show();
       }
       if (!isDeviceSupportCamera()) {
-        Toast.makeText(cordova.getActivity(), "Sorry! Your device doesn't support camera", Toast.LENGTH_LONG).show();
+        PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+        context.sendPluginResult(result);
+
+        //  Toast.makeText(cordova.getActivity(), "Sorry! Your device doesn't support camera", Toast.LENGTH_LONG).show();
       }
     } else {
       // finish();
