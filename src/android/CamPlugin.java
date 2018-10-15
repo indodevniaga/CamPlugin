@@ -73,7 +73,19 @@ public class CamPlugin extends CordovaPlugin {
     //     DURATION_LONG.equals(duration) ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
     // // Display toast
     // toast.show();
+    if(hasPermisssionStorage()){
+      try {
+        dispatchTakePictureIntent();
+
+      } catch (IOException io) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK);
+        context.sendPluginResult(result);
+
+        //Toast.makeText(cordova.getActivity(), "error camera", Toast.LENGTH_SHORT).show();
+      }
+    }else{
     requestPermissionsStorage(0);
+    }
     
     return true;
   }
@@ -104,7 +116,7 @@ public class CamPlugin extends CordovaPlugin {
         // if(location != null){
         try {
 
-          json.put("photoPath", url);
+          json.put("photoPath", Uri.fromFile(f));
           PluginResult result = new PluginResult(PluginResult.Status.OK, json);
           context.sendPluginResult(result);
         } catch (JSONException exc) {
