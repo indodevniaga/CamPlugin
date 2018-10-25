@@ -48,7 +48,7 @@ public class CamPlugin extends CordovaPlugin {
   public static final int MEDIA_TYPE_IMAGE = 1;
   Uri mCameraUri;
   String modifiedImagePath;
-  String[] permissions = { Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA };
+  String[] permissions = { Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.READ_EXTERNAL_STORAGE,Manifest.permission.CAMERA };
   String pathPicture;
 
   public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
