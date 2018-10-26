@@ -125,9 +125,9 @@ public class CamPlugin extends CordovaPlugin {
         }
      
       } catch (IOException e) {
-      
-        PluginResult result = new PluginResult(PluginResult.Status.ERROR);
-        context.sendPluginResult(result);
+     
+        PluginResult  result = new PluginResult(PluginResult.Status.ERROR);
+          context.sendPluginResult(result);
       }
 
     }
@@ -191,6 +191,7 @@ public class CamPlugin extends CordovaPlugin {
       mCameraUri = cordova.getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
           new ContentValues());
       Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+      cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
       if (cameraIntent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCameraUri);
         cordova.setActivityResultCallback(this);
