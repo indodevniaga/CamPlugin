@@ -100,7 +100,11 @@ public class CamPlugin extends CordovaPlugin {
 
     if (origWidth > destWidth) {
       int destHeight = origHeight / (origWidth / destWidth);
-      Bitmap b2 = Bitmap.createScaledBitmap(b, 300, 300, false);
+      Matrix matrix = new Matrix();
+      int rotation = fixOrientation(b);
+      matrix.postRotate(rotation);
+      Bitmap scaledBitmap = Bitmap.createScaledBitmap(b, 300, 300, false);
+      Bitmap b2 = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
       ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
       b2.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
@@ -132,6 +136,13 @@ public class CamPlugin extends CordovaPlugin {
 
     }
 
+  }
+
+  private static int fixOrientation(Bitmap bitmap) {
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            return 90;
+        }
+        return 0;
   }
 
   public boolean hasPermisssionStorage() {
