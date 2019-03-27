@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.graphics.drawable.BitmapDrawable;
 import org.apache.cordova.LOG;
 
@@ -86,7 +87,7 @@ public class CamPlugin extends CordovaPlugin {
     }else{
     requestPermissionsStorage(0);
     }
-    
+
     return true;
   }
 
@@ -95,23 +96,33 @@ public class CamPlugin extends CordovaPlugin {
     Bitmap b = BitmapFactory.decodeFile(imgFileOrig.getAbsolutePath());
     int origWidth = b.getWidth();
     int origHeight = b.getHeight();
-
+   
     final int destWidth = 600;// or the width you need
 
     if (origWidth > destWidth) {
       int destHeight = origHeight / (origWidth / destWidth);
       Matrix matrix = new Matrix();
-      int rotation = fixOrientation(b);
-      matrix.postRotate(rotation);
-      Bitmap scaledBitmap = Bitmap.createScaledBitmap(b, 300, 300, false);
-      Bitmap b2 = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-
-      b2.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
-
-      File f = new File(url);
-
+      // int rotation = fixOrientation(b);
+      // matrix.postRotate(rotation);
+      
       try {
+
+        ExifInterface exif = new ExifInterface(url);
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL); 
+        int rotationInDegrees = exifToDegrees(rotation);
+        
+        if (rotation != 0) {
+          matrix.preRotate(rotationInDegrees);
+        }
+  
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(b, 300, 300, false);
+        Bitmap b2 = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+  
+        b2.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
+  
+        File f = new File(url);
+  
         f.createNewFile();
         FileOutputStream fo = new FileOutputStream(f);
         fo.write(outStream.toByteArray());
@@ -121,15 +132,16 @@ public class CamPlugin extends CordovaPlugin {
         try {
 
           json.put("photoPath", Uri.fromFile(f));
+          json.put("orientation", rotationInDegrees);
           PluginResult result = new PluginResult(PluginResult.Status.OK, json);
           context.sendPluginResult(result);
         } catch (JSONException exc) {
           PluginResult  result = new PluginResult(PluginResult.Status.ERROR);
           context.sendPluginResult(result);
         }
-     
+
       } catch (IOException e) {
-     
+
         PluginResult  result = new PluginResult(PluginResult.Status.ERROR);
           context.sendPluginResult(result);
       }
@@ -144,6 +156,13 @@ public class CamPlugin extends CordovaPlugin {
         }
         return 0;
   }
+
+  private static int exifToDegrees(int exifOrientation) {
+    if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
+    else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
+    else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+    return 0;
+ }
 
   public boolean hasPermisssionStorage() {
     boolean statusPermission = false;
@@ -183,7 +202,7 @@ public class CamPlugin extends CordovaPlugin {
 
   public void requestPermissionsStorage(int requestCode) {
     PermissionHelper.requestPermissions(this, requestCode, permissions);
-    
+
   }
 
 
@@ -215,10 +234,10 @@ public class CamPlugin extends CordovaPlugin {
 
   private boolean isDeviceSupportCamera() {
     if (cordova.getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-  
+
       return true;
     } else {
-   
+
       return false;
     }
   }
@@ -239,9 +258,9 @@ public class CamPlugin extends CordovaPlugin {
     fileUri = savedInstanceState.getParcelable("file_uri");
   }
 
-  
+
   private static File getOutputMediaFile(int type) {
-   
+
     File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
         "Attendance");
     if (!mediaStorageDir.exists()) {
@@ -251,7 +270,7 @@ public class CamPlugin extends CordovaPlugin {
       }
     }
 
-   
+
 
     File mediaFile;
     if (type == MEDIA_TYPE_IMAGE) {
@@ -266,7 +285,7 @@ public class CamPlugin extends CordovaPlugin {
 
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     PluginResult result;
-  
+
     if (resultCode == -1) {
       if (requestCode == REQUEST_CAMERA) {
         final boolean isLolipop = Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1;
