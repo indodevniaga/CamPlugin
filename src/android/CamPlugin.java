@@ -3,6 +3,7 @@ package com.indodevniaga.cordova.plugin;
 // The native Toast API
 import android.widget.Toast;
 import android.net.Uri;
+import android.app.Activity;
 import android.Manifest;
 import android.os.Build;
 import android.content.pm.PackageManager;
@@ -43,6 +44,7 @@ public class CamPlugin extends CordovaPlugin {
   public CallbackContext context;
   FileUtil fileUtil;
   private static final int REQUEST_CAMERA = 100;
+  private static final int REQUEST_IMAGE_CAPTURE  = 1;
 
   private static final int REQUEST_SCAN = 4;
   private Uri fileUri = null;
@@ -96,7 +98,7 @@ public class CamPlugin extends CordovaPlugin {
     Bitmap b = BitmapFactory.decodeFile(imgFileOrig.getAbsolutePath());
     int origWidth = b.getWidth();
     int origHeight = b.getHeight();
-   
+
     final int destWidth = 600;// or the width you need
 
     if (origWidth > destWidth) {
@@ -104,25 +106,25 @@ public class CamPlugin extends CordovaPlugin {
       Matrix matrix = new Matrix();
       // int rotation = fixOrientation(b);
       // matrix.postRotate(rotation);
-      
+
       try {
 
         ExifInterface exif = new ExifInterface(url);
-        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL); 
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         int rotationInDegrees = exifToDegrees(rotation);
-        
+
         if (rotation != 0) {
           matrix.preRotate(rotationInDegrees);
         }
-  
+
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(b, 300, 300, false);
         Bitmap b2 = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-  
+
         b2.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
-  
+
         File f = new File(url);
-  
+
         f.createNewFile();
         FileOutputStream fo = new FileOutputStream(f);
         fo.write(outStream.toByteArray());
@@ -213,7 +215,7 @@ public class CamPlugin extends CordovaPlugin {
       Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
       fileUri = getOutputMediaFileUri(1);
       intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-      cordova.setActivityResultCallback(this);
+      // cordova.setActivityResultCallback(this);
       cordova.startActivityForResult((CordovaPlugin) this, intent, REQUEST_CAMERA);
       Log.e("SDK:", "" + Build.VERSION.SDK_INT);
     } else {
@@ -224,7 +226,7 @@ public class CamPlugin extends CordovaPlugin {
       cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
       if (cameraIntent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCameraUri);
-        cordova.setActivityResultCallback(this);
+        // cordova.setActivityResultCallback(this);
         cordova.startActivityForResult((CordovaPlugin) this, cameraIntent, REQUEST_CAMERA);
       }
 
@@ -286,8 +288,7 @@ public class CamPlugin extends CordovaPlugin {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     PluginResult result;
 
-    if (resultCode == -1) {
-      if (requestCode == REQUEST_CAMERA) {
+      if (requestCode == REQUEST_CAMERA && resultCode == Activity.RESULT_OK) {
         final boolean isLolipop = Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1;
         if (isLolipop) {
           Log.e("Uri Camera", "" + fileUri.getPath());
@@ -305,25 +306,28 @@ public class CamPlugin extends CordovaPlugin {
 
         }
       }
-
-      else if (resultCode == 0) {
-         result = new PluginResult(PluginResult.Status.ERROR);
-        context.sendPluginResult(result);
+      else {
+        this.failPicture("No Image Selected");
+        // result = new PluginResult(PluginResult.Status.ERROR);
+        // context.sendPluginResult(result);
         //  Toast.makeText(cordova.getActivity(), "User cancelled image capture", Toast.LENGTH_SHORT).show();
-      } else {
-         result = new PluginResult(PluginResult.Status.ERROR);
-        context.sendPluginResult(result);
-
-        //Toast.makeText(cordova.getActivity(), "Sorry, You Cant't Capture Image", Toast.LENGTH_SHORT).show();
       }
+      // else {
+      //    result = new PluginResult(PluginResult.Status.ERROR);
+      //   context.sendPluginResult(result);
+
+      //   //Toast.makeText(cordova.getActivity(), "Sorry, You Cant't Capture Image", Toast.LENGTH_SHORT).show();
+      // }
+
       if (!isDeviceSupportCamera()) {
          result = new PluginResult(PluginResult.Status.ERROR);
         context.sendPluginResult(result);
         //  Toast.makeText(cordova.getActivity(), "Sorry! Your device doesn't support camera", Toast.LENGTH_LONG).show();
       }
-    } else {
-      // finish();
-    }
+
   }
 
+  public void failPicture(String err) {
+    this.context.error(err);
+  }
 }
